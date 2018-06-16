@@ -29,13 +29,23 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
+
+    // jackson
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version:'2.9.3'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.9.3'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version:'2.9.3'
+
+    compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+
+    // Spring-Boot
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.0.0.RELEASE'
-
     runtime group: 'org.springframework.boot', name: 'spring-boot-starter-data-rest', version: '2.0.0.RELEASE'
-
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-activemq', version: '2.0.0.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-log4j2', version: '2.0.0.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat', version: '2.0.0.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb', version: '2.0.0.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: '2.0.0.RELEASE'
+
 
     compile group: 'com.aliyun', name: 'aliyun-java-sdk-core', version: '3.5.0'
 

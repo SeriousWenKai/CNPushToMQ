@@ -1,12 +1,12 @@
 package com.edoctor.api;//package com.edoctor.api;
 
-
 import com.edoctor.bean.DeviceLog;
 import com.edoctor.enums.NOTIFY_TYPE;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -27,21 +27,23 @@ public class MQApi {
 
     private static Logger LOG = LoggerFactory.getLogger(MQApi.class);
 
+    private MongoOperations mongo;
     private JmsOperations jmsOperations;
+
     @Autowired
-    public MQApi(JmsOperations jmsOperations) {
+    public MQApi(JmsOperations jmsOperations, MongoOperations mongo) {
         this.jmsOperations = jmsOperations;
+        this.mongo = mongo;
     }
 
     private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'");
 
     private static String testString = "{\"notifyType\":\"deviceDataChanged\",\"requestId\":null,\"service\":{\"serviceType\":\"Temperature\",\"data\":{\"Temperature\":85},\"eventTime\":\"20180607T203022Z\",\"serviceId\":\"Temperature\"},\"deviceId\":\"92435f3f-579a-40d0-8e3d-3ecaafd3ed22\",\"gatewayId\":\"92435f3f-579a-40d0-8e3d-3ecaafd3ed22\"}";
 
-    @RequestMapping(value = "autoPush", method = RequestMethod.POST, produces = "application/json")
-    public String getOneObjectFromMQ(Model model, HttpServletRequest request) {
+    @RequestMapping(value = "autoPush", method = RequestMethod.POST, consumes = "application/json")
+    public void autoPush(Model model, HttpServletRequest request) {
         JSONObject json = parseHttp2Json(request);
         String notifyType = (String)json.get("notifyType");
-        System.out.println("notifyType = " + notifyType);
         switch(NOTIFY_TYPE.valueOf(notifyType.trim())) {
             case testNotify:testNotify(json);break;
             case deviceAdded:deviceAdded(json);break;
@@ -55,9 +57,12 @@ public class MQApi {
             case ruleEvent:ruleEvent(json);break;
             case bindDevice:bindDevice(json);break;
             case deviceDatasChanged:deviceDatasChanged(json);break;
-
         }
-        return null;
+    }
+
+    @RequestMapping(value = "insertToMQ", method = RequestMethod.POST, consumes = "application/json")
+    public void insertToMQ(@RequestBody DeviceLog deviceLog) {
+        mongo.save(deviceLog);
     }
 
     private void testNotify(JSONObject json) {

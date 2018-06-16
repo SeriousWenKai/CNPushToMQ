@@ -1,9 +1,14 @@
 package com.edoctor.bean;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.HashMap;
 
+@Document
 public class DeviceLog {
 
+    @Id
     private String id;
     private String deviceId;
     private String deviceType;
