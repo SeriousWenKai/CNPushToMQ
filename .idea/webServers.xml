@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="5a1f085b-ad03-4fe0-8f0d-b12851a77e16" name="insertServer1" url="http://219.150.56.228">
+        <fileTransfer host="219.150.56.228" port="22" rootFolder="/usr/local/apache-tomcat-9.0.4/webapps" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+      <webServer id="c76279c9-115e-438b-8076-e5ee07d11fc2" name="insertServer2" url="http://219.150.56.229">
+        <fileTransfer host="219.150.56.229" port="22" rootFolder="/usr/local/apache-tomcat-9.0.4/webapps" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

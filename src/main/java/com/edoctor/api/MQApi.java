@@ -1,6 +1,8 @@
 package com.edoctor.api;//package com.edoctor.api;
 
+import com.edoctor.bean.Device;
 import com.edoctor.bean.DeviceLog;
+import com.edoctor.dao.DeviceDao;
 import com.edoctor.enums.NOTIFY_TYPE;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -29,11 +31,13 @@ public class MQApi {
 
     private MongoOperations mongo;
     private JmsOperations jmsOperations;
+    private DeviceDao deviceDao;
 
     @Autowired
-    public MQApi(JmsOperations jmsOperations, MongoOperations mongo) {
+    public MQApi(JmsOperations jmsOperations, MongoOperations mongo, DeviceDao deviceDao) {
         this.jmsOperations = jmsOperations;
         this.mongo = mongo;
+        this.deviceDao = deviceDao;
     }
 
     private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'");
@@ -62,6 +66,14 @@ public class MQApi {
 
     @RequestMapping(value = "insertToMQ", method = RequestMethod.POST, consumes = "application/json")
     public void insertToMQ(@RequestBody DeviceLog deviceLog) {
+        Device device = deviceDao.getDeviceByDeviceId(deviceLog.getDeviceId());
+        deviceLog.setDeviceType(device.getName());
+        switch(device.getRunningStatus().trim()) {
+            case "NORMAL" : deviceLog.setLog_type("INFO");break;
+            case "ABNORMAL" : deviceLog.setLog_type("ABNORMAL");break;
+            case "FAULT" : deviceLog.setLog_type("FAULT");break;
+            default : deviceLog.setLog_type("[device.getRunningStatus() = " + device.getRunningStatus() + "]ERROR RUNNING STATUS");
+        }
         mongo.save(deviceLog);
     }
 
