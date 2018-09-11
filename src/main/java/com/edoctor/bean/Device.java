@@ -13,7 +13,7 @@ public class Device {
     private String nodeId;
     private String name;
     private String description;
-    private String manufactureId;
+    private String manufacturerId;
     private String manufacturerName;
     private String mac;
     private String location;
@@ -64,12 +64,12 @@ public class Device {
         this.area = area;
     }
 
-    public Device(String deviceId, String nodeId, String name, String description, String manufactureId, String manufacturerName, String mac, String location, String deviceType, String model, String swVersion, String fwVersion, String hwVersion, String protocolType, String signalStrength, String bridgeId, String supportedSecurity, String isSecurity, String sigVersion, String runningStatus, String status, String statusDetail, String mute, Double lng, Double lat, Integer owner_id, String area) {
+    public Device(String deviceId, String nodeId, String name, String description, String manufacturerId, String manufacturerName, String mac, String location, String deviceType, String model, String swVersion, String fwVersion, String hwVersion, String protocolType, String signalStrength, String bridgeId, String supportedSecurity, String isSecurity, String sigVersion, String runningStatus, String status, String statusDetail, String mute, Double lng, Double lat, Integer owner_id, String area) {
         this.deviceId = deviceId;
         this.nodeId = nodeId;
         this.name = name;
         this.description = description;
-        this.manufactureId = manufactureId;
+        this.manufacturerId = manufacturerId;
         this.manufacturerName = manufacturerName;
         this.mac = mac;
         this.location = location;
@@ -134,12 +134,12 @@ public class Device {
         this.description = description;
     }
 
-    public String getManufactureId() {
-        return manufactureId;
+    public String getManufacturerId() {
+        return manufacturerId;
     }
 
-    public void setManufactureId(String manufactureId) {
-        this.manufactureId = manufactureId;
+    public void setManufacturerId(String manufacturerId) {
+        this.manufacturerId = manufacturerId;
     }
 
     public String getManufacturerName() {
@@ -334,7 +334,7 @@ public class Device {
                 ", nodeId='" + nodeId + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", manufactureId='" + manufactureId + '\'' +
+                ", manufacturerId='" + manufacturerId + '\'' +
                 ", manufacturerName='" + manufacturerName + '\'' +
                 ", mac='" + mac + '\'' +
                 ", location='" + location + '\'' +

@@ -19,7 +19,7 @@ public class DBConfig {
         ds.setInitialSize(10);
         ds.setDefaultAutoCommit(true);
         ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        ds.setUrl("jdbc:mysql://123.207.162.21:3306/edoctor?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8");
+        ds.setUrl("jdbc:mysql://10.10.119.5:3306/edoctor?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8");
         ds.setUsername("chinanet");
         ds.setPassword("EDoctor@666");
         return ds;

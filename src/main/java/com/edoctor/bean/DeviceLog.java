@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.HashMap;
 
 @Document
-public class DeviceLog {
+public class   DeviceLog {
 
     @Id
     private String id;

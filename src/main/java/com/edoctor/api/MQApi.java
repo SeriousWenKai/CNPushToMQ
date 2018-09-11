@@ -67,7 +67,12 @@ public class MQApi {
     @RequestMapping(value = "insertToMQ", method = RequestMethod.POST, consumes = "application/json")
     public void insertToMQ(@RequestBody DeviceLog deviceLog) {
         Device device = deviceDao.getDeviceByDeviceId(deviceLog.getDeviceId());
-        deviceLog.setDeviceType(device.getName());
+        if(device == null) {
+            LOG.error("deviceId = " + deviceLog.getDeviceId() + " is null,please notice");
+            return;
+        } else {
+            deviceLog.setDeviceType(device.getDeviceType());
+        }
         switch(device.getRunningStatus().trim()) {
             case "NORMAL" : deviceLog.setLog_type("INFO");break;
             case "ABNORMAL" : deviceLog.setLog_type("ABNORMAL");break;
