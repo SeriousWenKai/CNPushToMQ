@@ -64,7 +64,7 @@ public class MQApi {
         }
     }
 
-    @RequestMapping(value = "insertToMQ", method = RequestMethod.POST, consumes = "application/json")
+    @RequestMapping(value = "insertToMongo", method = RequestMethod.POST, consumes = "application/json")
     public void insertToMQ(@RequestBody DeviceLog deviceLog) {
         Device device = deviceDao.getDeviceByDeviceId(deviceLog.getDeviceId());
         if(device == null) {
@@ -73,10 +73,10 @@ public class MQApi {
         } else {
             deviceLog.setDeviceType(device.getDeviceType());
         }
-        switch(device.getRunningStatus().trim()) {
-            case "NORMAL" : deviceLog.setLog_type("INFO");break;
-            case "ABNORMAL" : deviceLog.setLog_type("ABNORMAL");break;
-            case "FAULT" : deviceLog.setLog_type("FAULT");break;
+        switch(deviceLog.getLog_type()) {
+            case "INFO" : deviceDao.updateDeviceRunningStatus(device.getDeviceId(), "NORMAL");break;
+            case "WARN" : deviceDao.updateDeviceRunningStatus(device.getDeviceId(), "ABNORMAL");break;
+            case "FAULT" : deviceDao.updateDeviceRunningStatus(device.getDeviceId(), "FAULT");break;
             default : deviceLog.setLog_type("[device.getRunningStatus() = " + device.getRunningStatus() + "]ERROR RUNNING STATUS");
         }
         mongo.save(deviceLog);
@@ -128,8 +128,23 @@ public class MQApi {
 
         JSONObject data = service.getJSONObject("data");
         Map<String, Object> kValue = data.toMap();
+        int log_typeIntValue = (int) kValue.get("log_type");
+        kValue.remove("log_type");
         LocalDateTime localDateTime = LocalDateTime.parse(eventTime, dateTimeFormatter);
-        DeviceLog deviceLog = new DeviceLog("IntoMQ", deviceId, serviceType, serviceId, (HashMap<String, Object>) kValue,localDateTime.toInstant(ZoneOffset.of("+8")).toEpochMilli(), "IntoMQ");
+        DeviceLog deviceLog = new DeviceLog("IoT", deviceId, serviceType, serviceId, (HashMap<String, Object>) kValue,localDateTime.toInstant(ZoneOffset.of("+8")).toEpochMilli(), "IntoMQ");
+        switch (log_typeIntValue) {
+            case 1:
+                deviceLog.setLog_type("INFO");
+                break;
+            case 2:
+                deviceLog.setLog_type("WARN");
+                break;
+            case 3:
+                deviceLog.setLog_type("FAULT");
+                break;
+            default:
+                LOG.error("log_type = " + log_typeIntValue + ", which is not 1,2,3.Invalid");
+        }
         jmsOperations.convertAndSend(deviceLog);
         LOG.info(LocalDateTime.now() + ", deviceLog=" + deviceLog + " has sent to MQ");
     }
