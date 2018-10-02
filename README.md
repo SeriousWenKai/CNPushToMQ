@@ -8,3 +8,8 @@
 1. 改JPA为常规Hibernate
 2. 完成日志正确存入队列并读取插入Mongo
 3. TODO:使用缓存来减少对数据库的访问
+
+## 2018-10-02
+1. 设备离线逻辑：
++ 设备正常传输日志-》日志设置一小时expireTime-》每当有新的同设备日志刷新其时间
++ 注：由于已经订阅了MQ，再订阅Redis时出现MessageListenerAdapter重复小问题，解决方案：把Redis订阅放到了EDoctor的后台去，但是保留API调用在

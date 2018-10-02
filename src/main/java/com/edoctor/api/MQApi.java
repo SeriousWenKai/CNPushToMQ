@@ -3,6 +3,7 @@ package com.edoctor.api;//package com.edoctor.api;
 import com.edoctor.bean.Device;
 import com.edoctor.bean.DeviceLog;
 import com.edoctor.dao.DeviceDao;
+import com.edoctor.dao.RedisDao;
 import com.edoctor.enums.NOTIFY_TYPE;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -32,12 +33,14 @@ public class MQApi {
     private MongoOperations mongo;
     private JmsOperations jmsOperations;
     private DeviceDao deviceDao;
+    private RedisDao redisDao;
 
     @Autowired
-    public MQApi(JmsOperations jmsOperations, MongoOperations mongo, DeviceDao deviceDao) {
+    public MQApi(JmsOperations jmsOperations, MongoOperations mongo, DeviceDao deviceDao, RedisDao redisDao) {
         this.jmsOperations = jmsOperations;
         this.mongo = mongo;
         this.deviceDao = deviceDao;
+        this.redisDao = redisDao;
     }
 
     private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'");
@@ -80,6 +83,27 @@ public class MQApi {
             default : deviceLog.setLog_type("[device.getRunningStatus() = " + device.getRunningStatus() + "]ERROR RUNNING STATUS");
         }
         mongo.save(deviceLog);
+    }
+
+    @RequestMapping(value = "updateDeviceOnlineInfo", method = RequestMethod.PUT)
+    public void updateDeviceOnlineInfo(@RequestParam(name = "deviceId") String deviceId, @RequestParam(name = "isOnline") Boolean isOnline) {
+        LOG.info("handleMessage = Serializable,deviceId = " + deviceId + ", offline status = " + isOnline);
+        deviceDao.updateDeviceOnlineOffline(deviceId, isOnline);
+    }
+
+    @RequestMapping(value = "getStringValueFromRedis", method = RequestMethod.GET)
+    public String getStringValueFromRedis(@RequestParam(name = "key") String key) {
+        return redisDao.getDeviceOnlineStatus(key);
+    }
+
+    @RequestMapping(value = "addKeyToRedis", method = RequestMethod.GET)
+    public void addKeyToRedis(@RequestParam(name = "key") String key, @RequestParam(name = "value") String value) {
+        redisDao.setDeviceOnlineStatus(key, value);
+    }
+
+    @RequestMapping(value = "refreshKeyInRedis", method = RequestMethod.GET)
+    public void refreshKeyInRedis(@RequestParam(name = "key") String key) {
+        redisDao.refreshKeyInRedis(key);
     }
 
     private void testNotify(JSONObject json) {
@@ -130,7 +154,8 @@ public class MQApi {
         Map<String, Object> kValue = data.toMap();
         int log_typeIntValue = (int) kValue.get("log_type");
         kValue.remove("log_type");
-        LocalDateTime localDateTime = LocalDateTime.parse(eventTime, dateTimeFormatter);
+        // 加8小时，使得UTC变为UTC+8
+        LocalDateTime localDateTime = LocalDateTime.parse(eventTime, dateTimeFormatter).plusHours(8);
         DeviceLog deviceLog = new DeviceLog("IoT", deviceId, serviceType, serviceId, (HashMap<String, Object>) kValue,localDateTime.toInstant(ZoneOffset.of("+8")).toEpochMilli(), "IntoMQ");
         switch (log_typeIntValue) {
             case 1:

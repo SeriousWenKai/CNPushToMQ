@@ -18,6 +18,8 @@ public class DeviceDaoImpl implements DeviceDao {
 
     private static final String updateDeviceRunningStatus = "UPDATE device SET runningStatus = :runningStatus WHERE deviceId= :deviceId";
 
+    private static final String updateDeviceOnlineOffline = "UPDATE device SET status = :status WHERE deviceId= :deviceId";
+
     private SessionFactory sessionFactory;
 
     @Autowired
@@ -41,6 +43,14 @@ public class DeviceDaoImpl implements DeviceDao {
         Query query = currentSession().createNativeQuery(updateDeviceRunningStatus);
         query.setParameter("deviceId", deviceId);
         query.setParameter("runningStatus", runningStatus);
+        query.executeUpdate();
+    }
+
+    @Override
+    public void updateDeviceOnlineOffline(String deviceId, Boolean isOnline) {
+        Query query = currentSession().createNativeQuery(updateDeviceOnlineOffline);
+        query.setParameter("deviceId", deviceId);
+        query.setParameter("status", isOnline ? "ONLINE" : "OFFLINE");
         query.executeUpdate();
     }
 }

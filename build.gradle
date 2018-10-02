@@ -38,6 +38,7 @@ dependencies {
     compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
 
     // Spring-Boot
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.0.0.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.0.0.RELEASE'
     runtime group: 'org.springframework.boot', name: 'spring-boot-starter-data-rest', version: '2.0.0.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-activemq', version: '2.0.0.RELEASE'

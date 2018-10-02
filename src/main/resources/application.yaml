@@ -1,7 +1,16 @@
 spring:
   profiles:
+#    active: FromNginx
     active: ToMongo
-    #active value change between 'FromNginx' and 'ToMongo'
+#    active: test
+    #active value change among 'test', 'FromNginx' and 'ToMongo'
+  redis:
+    host: 10.10.119.18
+    port: 6379
+    password: helloWorld@tanktju.com214ForEveryone
+#    host: localhost
+#    port: 6379
+#    password: redisServer
 server:
   port: 9000
   servlet:
