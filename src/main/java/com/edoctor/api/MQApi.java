@@ -69,6 +69,7 @@ public class MQApi {
 
     @RequestMapping(value = "insertToMongo", method = RequestMethod.POST, consumes = "application/json")
     public void insertToMQ(@RequestBody DeviceLog deviceLog) {
+        // 为了保证日志属性充足，加了deviceType到log中
         Device device = deviceDao.getDeviceByDeviceId(deviceLog.getDeviceId());
         if(device == null) {
             LOG.error("deviceId = " + deviceLog.getDeviceId() + " is null,please notice");
@@ -76,6 +77,10 @@ public class MQApi {
         } else {
             deviceLog.setDeviceType(device.getDeviceType());
         }
+
+        /**
+         * String deviceStatusInRedis = "DeviceErrorStatus" + device.getDeviceId();
+         */
         switch(deviceLog.getLog_type()) {
             case "INFO" : deviceDao.updateDeviceRunningStatus(device.getDeviceId(), "NORMAL");break;
             case "WARN" : deviceDao.updateDeviceRunningStatus(device.getDeviceId(), "ABNORMAL");break;
@@ -142,6 +147,7 @@ public class MQApi {
         System.out.println("deviceDeleted");
     }
 
+    // 此为MQ中存入日志的预处理操作
     private void deviceDataChanged(JSONObject json) {
         String deviceId = json.getString("deviceId");
         String notifyType = json.getString("notifyType");
@@ -170,6 +176,7 @@ public class MQApi {
             default:
                 LOG.error("log_type = " + log_typeIntValue + ", which is not 1,2,3.Invalid");
         }
+        // 存入了MQ
         jmsOperations.convertAndSend(deviceLog);
         LOG.info(LocalDateTime.now() + ", deviceLog=" + deviceLog + " has sent to MQ");
     }
