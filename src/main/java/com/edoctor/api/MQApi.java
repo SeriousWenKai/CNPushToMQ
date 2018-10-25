@@ -78,15 +78,30 @@ public class MQApi {
             deviceLog.setDeviceType(device.getDeviceType());
         }
 
-        /**
-         * String deviceStatusInRedis = "DeviceErrorStatus" + device.getDeviceId();
-         */
-        switch(deviceLog.getLog_type()) {
-            case "INFO" : deviceDao.updateDeviceRunningStatus(device.getDeviceId(), "NORMAL");break;
-            case "WARN" : deviceDao.updateDeviceRunningStatus(device.getDeviceId(), "ABNORMAL");break;
-            case "FAULT" : deviceDao.updateDeviceRunningStatus(device.getDeviceId(), "FAULT");break;
-            default : deviceLog.setLog_type("[device.getRunningStatus() = " + device.getRunningStatus() + "]ERROR RUNNING STATUS");
+        String deviceErrorStatusKey = "DeviceErrorStatus_" + deviceLog.getDeviceId();
+        String deviceErrorStatusValue = redisDao.getDeviceErrorStatus(deviceErrorStatusKey);
+        if(deviceErrorStatusValue == null){
+            //Redis里没有设备对应的日志,插入
+            addKeyToRedis(deviceErrorStatusKey, deviceLog.getLog_type());
+            //更新Mysql中的状态
+            switch(deviceLog.getLog_type()) {
+                case "INFO" : deviceDao.updateDeviceRunningStatus(device.getDeviceId(), "NORMAL");break;
+                case "WARN" : deviceDao.updateDeviceRunningStatus(device.getDeviceId(), "ABNORMAL");break;
+                case "FAULT" : deviceDao.updateDeviceRunningStatus(device.getDeviceId(), "FAULT");break;
+                default : deviceLog.setLog_type("[device.getRunningStatus() = " + device.getRunningStatus() + "]ERROR RUNNING STATUS");
+            }
+
+        }else if(!deviceErrorStatusValue.equals(deviceLog.getLog_type())){
+            //Redis有设备对应的日志，查看状态是否相同，如果不同，则更新Mysql和Redis
+            redisDao.refreshDeviceErrorStatusInRedis(deviceErrorStatusKey, deviceLog.getLog_type());
+            switch(deviceLog.getLog_type()) {
+                case "INFO" : deviceDao.updateDeviceRunningStatus(device.getDeviceId(), "NORMAL");break;
+                case "WARN" : deviceDao.updateDeviceRunningStatus(device.getDeviceId(), "ABNORMAL");break;
+                case "FAULT" : deviceDao.updateDeviceRunningStatus(device.getDeviceId(), "FAULT");break;
+                default : deviceLog.setLog_type("[device.getRunningStatus() = " + device.getRunningStatus() + "]ERROR RUNNING STATUS");
+            }
         }
+        //存入Mongo
         mongo.save(deviceLog);
     }
 

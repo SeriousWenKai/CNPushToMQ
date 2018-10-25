@@ -16,6 +16,14 @@ public class RedisDaoImpl implements RedisDao {
     @Autowired
     RedisTemplate<String, String> redisOpObj;
 
+    //刷新Redis的状态：返回True，刷新成功(1.状态存在、但新日志与原日志状态不一样，需要更新Mysql  2.状态不存在，同样需要)
+    @Override
+    public void refreshDeviceErrorStatusInRedis(String key, String value) { redisOpObj.opsForValue().set(key, value); }
+
+    //返回设备在Redis中的状态
+    @Override
+    public String getDeviceErrorStatus(String key) { return redisOpObj.opsForValue().get(key); }
+
 
     @Override
     public void deleteOneKey(String key) {

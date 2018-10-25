@@ -8,4 +8,9 @@ public interface RedisDao {
     String getDeviceOnlineStatus(String key);
 
     void refreshKeyInRedis(String key);
+
+    void refreshDeviceErrorStatusInRedis(String key, String value);
+
+    String getDeviceErrorStatus(String key);
+
 }
